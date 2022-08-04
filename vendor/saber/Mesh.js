@@ -1,5 +1,8 @@
-import { MathUtil as M } from "./MathUtil";
-import { Utils as U } from "./Utils";
+import { MathUtil } from "./MathUtil";
+import { Uniform } from "./Mesh/Uniform";
+import { Attribute } from "./Mesh/Attribute";
+
+const { Mat4, Vec3 } = MathUtil;
 
 export class Mesh {
   constructor({ app, geo, shader, attribute, uniform }) {
@@ -9,6 +12,16 @@ export class Mesh {
     this.shader = shader;
     this.initialAttribute = attribute;
     this.initialUniform = uniform;
+
+    this.rotate = {
+      axis: { x: 0.0, y: 0.0, z: 0.0 },
+      value: 0.0,
+    };
+
+    this.scale = { x: 1.0, y: 1.0, z: 1.0 };
+
+    this.translate = { x: 0.0, y: 0.0, z: 0.0 };
+
     this.init();
   }
 
@@ -16,27 +29,23 @@ export class Mesh {
     const { app, geo, shader, initialAttribute, initialUniform } = this;
     await shader.init();
     const { gl } = app;
+
+    // program
     this.program = this.createProgramObject(
       gl,
       shader.vsObject,
       shader.fsObject
     );
-    // IBOを用意した時だけ発火
+
+    // ibo
     if (geo.index) {
       this.ibo = this.createIBO(gl, geo.index);
     }
     // attribute
-    this.attribute = this.setupAttribute(
-      gl,
-      geo,
-      this.program,
-      initialAttribute
-    );
-    // uniform
-    this.uniform = this.setupUniform(gl, this.program, initialUniform);
+    this.attribute = new Attribute(gl, geo, this.program, initialAttribute);
 
-    // 一旦
-    this.startTime = new Date();
+    // uniform
+    this.uniform = new Uniform(gl, this.program, initialUniform);
   }
 
   createProgramObject(gl, vsObject, fsObject) {
@@ -62,54 +71,6 @@ export class Mesh {
     }
   }
 
-  setupAttribute(gl, geo, program, attribute) {
-    const _attr = {
-      position: [geo.position, 3],
-      normal: [geo.normal, 3],
-      color: [geo.color, 4],
-      ...attribute,
-    };
-    for (const key in _attr) {
-      const target = _attr[key];
-      const value = target[0];
-      const stride = target[1];
-      const vbo = this.createVBO(gl, value);
-      const location = this.getLocation(gl, program, key);
-      // this.enableAttribute(gl, vbo, location, stride);
-      _attr[key] = { location, vbo, value, stride };
-    }
-    return _attr;
-  }
-
-  setupUniform(gl, program, uniform) {
-    const _uniform = {
-      uTime: 0.0,
-      mvpMatrix: new Float32Array([...Array(16).fill(0)]),
-      normalInverseMatrix: new Float32Array([...Array(16).fill(0)]),
-      ...uniform,
-    };
-    for (const key in _uniform) {
-      const location = gl.getUniformLocation(program, key);
-      const value = _uniform[key];
-      const method = this.getMethodType(value);
-      _uniform[key] = { location, value, method };
-    }
-    return _uniform;
-  }
-
-  // setupAttribute start =============
-  createVBO(gl, vertexArray) {
-    const vbo = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
-    gl.bufferData(
-      gl.ARRAY_BUFFER,
-      new Float32Array(vertexArray),
-      gl.STATIC_DRAW
-    );
-    gl.bindBuffer(gl.ARRAY_BUFFER, null);
-    return vbo;
-  }
-
   createIBO(gl, indexArray) {
     const ibo = gl.createBuffer();
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo);
@@ -122,83 +83,62 @@ export class Mesh {
     return ibo;
   }
 
-  getLocation(gl, program, key) {
-    return gl.getAttribLocation(program, key);
-  }
-
-  enableAttribute(gl) {
-    for (const key in this.attribute) {
-      const { location, vbo, stride } = this.attribute[key];
-      gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
-      gl.enableVertexAttribArray(location);
-      gl.vertexAttribPointer(location, stride, gl.FLOAT, false, 0, 0);
-    }
-
-    // gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
-    // gl.enableVertexAttribArray(attLocation);
-    // gl.vertexAttribPointer(attLocation, attStride, gl.FLOAT, false, 0, 0);
-  }
-  // setupAttribute end ===============
-
-  getMethodType(value) {
-    let tmp = "uniform";
-    const type = value.constructor.name;
-    if (type === "Float32Array") {
-      tmp += "Matrix";
-      switch (value.length) {
-        case 4:
-          tmp += "2";
-          break;
-        case 9:
-          tmp += "3";
-          break;
-        case 16:
-          tmp += "4";
-          break;
-      }
-      tmp += "fv";
-    } else {
-      if (Array.isArray(value)) {
-        switch (value.length) {
-          case 1:
-            tmp += "1";
-            break;
-          case 2:
-            tmp += "2";
-            break;
-          case 3:
-            tmp += "3";
-            break;
-          case 4:
-            tmp += "4";
-            break;
-        }
-        tmp += "fv";
-      } else {
-        tmp += "1";
-        if (U.isInteger) {
-          tmp += "i";
-        } else if (U.isFloat) {
-          tmp += "f";
-        }
-      }
-    }
-    return tmp;
-  }
-
   setupModelMatrix() {
-    const rotateAxis = M.Vec3.create(0.0, 1.0, 1.0);
-    const m = M.Mat4.rotate(
-      M.Mat4.identity(),
-      this.uniform.uTime.value,
-      rotateAxis
-    );
+    let m = Mat4.identity();
+    m = this._rotate(m);
+    m = this._scale(m);
+    m = this._translate(m);
     return m;
   }
 
+  // ==== モデル変換 =========
+  _rotate(m) {
+    // rotate.axisが全て0だとerrorになるので、回避
+    if (
+      this.rotate.axis.x !== 0.0 ||
+      this.rotate.axis.y !== 0.0 ||
+      this.rotate.axis.z !== 0.0
+    ) {
+      const rotateAxis = Vec3.create(
+        this.rotate.axis.x,
+        this.rotate.axis.y,
+        this.rotate.axis.z
+      );
+      m = Mat4.rotate(m, this.rotate.value, rotateAxis);
+    }
+    return m;
+  }
+
+  _scale(m) {
+    // scaleが全て1だと処理が不要なので、回避
+    if (this.scale.x !== 1.0 || this.scale.y !== 1.0 || this.scale.z !== 1.0) {
+      const scaleVec = Vec3.create(this.scale.x, this.scale.y, this.scale.z);
+      m = Mat4.scale(m, scaleVec);
+    }
+    return m;
+  }
+
+  _translate(m) {
+    // translate.vecが全て0だとerrorになるので、回避
+    if (
+      this.translate.x !== 0.0 ||
+      this.translate.y !== 0.0 ||
+      this.translate.z !== 0.0
+    ) {
+      const translateVec = Vec3.create(
+        this.translate.x,
+        this.translate.y,
+        this.translate.z
+      );
+      m = Mat4.translate(m, translateVec);
+    }
+    return m;
+  }
+  // ==== モデル変換 =========
+
   setupMVP(m, v, p) {
-    const vp = M.Mat4.multiply(p, v);
-    const mvp = M.Mat4.multiply(vp, m);
+    const vp = Mat4.multiply(p, v);
+    const mvp = Mat4.multiply(vp, m);
     return mvp;
   }
 
@@ -223,23 +163,15 @@ export class Mesh {
     // const nowTime = (new Date() - this.startTime) * 0.001;
     const m = this.setupModelMatrix();
     const mvp = this.setupMVP(m, v, p);
-    const normalInverseMatrix = M.Mat4.transpose(M.Mat4.inverse(m));
+    const normalInverseMatrix = Mat4.transpose(Mat4.inverse(m));
 
     this.uniform.normalInverseMatrix.value = normalInverseMatrix;
     this.uniform.mvpMatrix.value = mvp;
 
     gl.useProgram(this.program);
 
-    Object.keys(this.uniform).forEach((uniformKey) => {
-      const { location, value, method } = this.uniform[uniformKey];
-      if (method.includes("Matrix")) {
-        gl[method](location, false, value);
-      } else {
-        gl[method](location, value);
-      }
-    });
-
-    this.enableAttribute(gl);
+    this.uniform._enable(gl);
+    this.attribute._enable(gl);
     if (this.ibo) gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.ibo);
 
     gl.drawElements(gl.TRIANGLES, this.geo.index.length, gl.UNSIGNED_SHORT, 0);

@@ -16,6 +16,7 @@ export default class CExample {
       el: "#canvas",
       sw: this.sw,
       sh: this.sh,
+      clearColor: [0.3, 0.3, 0.3, 1.0],
     });
     this.scene = new Saber.Scene();
 
@@ -30,7 +31,18 @@ export default class CExample {
     });
 
     this.mesh = this.createMesh();
+    this.mesh.rotate.axis.z = 1;
+    this.mesh.rotate.value = 0.5;
+    this.mesh.translate.x = 0.5;
+
+    this.mesh_ = this.createMesh();
+    this.mesh_.translate.x = -0.5;
+    this.mesh_.translate.y = -0.5;
+    this.mesh_.scale.x = 1.5;
+    this.mesh_.scale.y = 0.5;
+
     this.scene.add(this.mesh);
+    this.scene.add(this.mesh_);
     this.tick();
   }
 
@@ -66,7 +78,9 @@ export default class CExample {
 
   tick() {
     requestAnimationFrame(() => this.tick());
+
     const { scene, camera } = this;
     this.app.render(scene, camera);
+    // this.mesh.quaternion.value = this.mesh.uniform.uTime.value;
   }
 }

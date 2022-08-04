@@ -1,22 +1,26 @@
-import { MathUtil as M } from "./MathUtil";
-
 export class App {
   el = null;
   sw = 0;
   sh = 0;
   gl = null;
 
-  constructor(params) {
+  constructor({ el, sw, sh, clearColor = [0.0, 0.0, 0.0, 1.0] }) {
     console.log("App");
-    this.params = params;
+    // this.params = params;
+    this.el = el;
+    this.sw = sw;
+    this.sh = sh;
+    this.clearColor = clearColor;
     this.init();
   }
+
   async init() {
-    this.el = this.getRoot(this.params.el);
+    this.el = this.getRoot(this.el);
     this.gl = this.getContext();
     // window.Saber = window.Saber || this;
-    this.setSize(this.params.sw, this.params.sh);
+    this.setSize(this.sw, this.sh);
   }
+
   getRoot(el) {
     const type = typeof el;
     switch (type) {
@@ -28,6 +32,7 @@ export class App {
         throw new Error("Can't root element.");
     }
   }
+
   getContext() {
     const gl = this.el.getContext("webgl");
     if (gl === null) {
@@ -38,16 +43,21 @@ export class App {
   }
 
   setSize(w, h) {
-    let { sw, sh } = this.params;
+    let { sw, sh } = this;
     this.el.width = sw = w;
     this.el.height = sh = h;
   }
 
   setupRendering() {
-    const { sw, sh } = this.params;
+    const { sw, sh } = this;
     const { gl } = this;
     gl.viewport(0, 0, sw, sh);
-    gl.clearColor(0.3, 0.3, 0.3, 1.0);
+    gl.clearColor(
+      this.clearColor[0],
+      this.clearColor[1],
+      this.clearColor[2],
+      this.clearColor[3]
+    );
     gl.clearDepth(1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.disable(gl.CULL_FACE);
