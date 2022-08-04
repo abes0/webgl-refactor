@@ -2,27 +2,48 @@ import { Utils as U } from "../Utils";
 export class Uniform {
   constructor(gl, program, uniform) {
     console.log("Uniform");
-    // this.gl = gl
-    // this.program = program
-    // this.uniform = uniform
+
+    this._defaultPropertyManager = {
+      uTime: {
+        isActive: false,
+        value: 0.0,
+        scale: 1.0,
+      },
+    };
+
     this._setup(gl, program, uniform);
   }
+
   _setup(gl, program, uniform) {
+    for (const key in this._defaultPropertyManager) {
+      if (uniform.hasOwnProperty(key)) {
+        if (typeof uniform[key] === "boolean") {
+          this._defaultPropertyManager[key].isActive = uniform[key];
+        } else if (typeof uniform[key] === "number") {
+          this._defaultPropertyManager[key].isActive = true;
+          this._defaultPropertyManager[key].scale = uniform[key];
+        }
+        if (this._defaultPropertyManager[key].isActive) {
+          uniform[key] = this._defaultPropertyManager[key].value;
+        } else {
+          delete uniform[key];
+        }
+      }
+    }
     const _uniform = {
-      uTime: 0.0,
       mvpMatrix: new Float32Array([...Array(16).fill(0)]),
       normalInverseMatrix: new Float32Array([...Array(16).fill(0)]),
       ...uniform,
     };
+
     for (const key in _uniform) {
       const location = gl.getUniformLocation(program, key);
       const value = _uniform[key];
       const method = this._getMethodType(value);
       this[key] = { location, value, method };
     }
-    // return _uniform;
-    // console.log(this);
   }
+
   _getMethodType(value) {
     let tmp = "uniform";
     const type = value.constructor.name;
@@ -69,8 +90,17 @@ export class Uniform {
     return tmp;
   }
 
+  _set(uniformObject) {
+    for (const key in uniformObject) {
+      if (!this.hasOwnProperty(key)) return;
+      this[key].value = this._defaultPropertyManager[key].value =
+        uniformObject[key] * this._defaultPropertyManager[key].scale;
+    }
+  }
+
   _enable(gl) {
     Object.keys(this).forEach((key) => {
+      if (key.charAt(0) === "_") return;
       const { location, value, method } = this[key];
       if (method.includes("Matrix")) {
         gl[method](location, false, value);
@@ -78,5 +108,6 @@ export class Uniform {
         gl[method](location, value);
       }
     });
+    console.log(this._defaultPropertyManager);
   }
 }

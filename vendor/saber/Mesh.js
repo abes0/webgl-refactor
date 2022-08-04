@@ -158,7 +158,6 @@ export class Mesh {
   }
 
   render(gl, v, p) {
-    console.log("mesh render");
     if (!this.uniform) return;
     // const nowTime = (new Date() - this.startTime) * 0.001;
     const m = this.setupModelMatrix();

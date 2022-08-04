@@ -9,12 +9,15 @@ export class Scene {
   }
   render(gl, v, p) {
     const nowTime = (new Date() - this.startTime) * 0.001;
-    const defaultUniform = {
+    const uniformObject = {
       uTime: nowTime,
     };
     if (this.meshList.length) {
       this.meshList.forEach((mesh) => {
-        mesh.setDefaultUniform(defaultUniform);
+        if (mesh.uniform) {
+          mesh.uniform._set(uniformObject);
+        }
+
         mesh.render(gl, v, p);
       });
     }

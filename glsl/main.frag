@@ -13,7 +13,7 @@ float dotScale = 0.5;
 void main(){
   vec3 n = (normalInverseMatrix * vec4(vNormal, 0.0)).xyz;
   float d = dot(normalize(n), normalize(light));
-  vec4 color = vec4(vColor.rgb * d, vColor.a);
+  vec4 color = vec4(sin(uTime), vColor.gb * d, vColor.a);
   gl_FragColor = color;
 }
 

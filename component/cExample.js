@@ -3,28 +3,21 @@ import vs from "../glsl/main.vert?raw";
 import fs from "../glsl/main.frag?raw";
 
 export default class CExample {
-  sw = 0;
-  sh = 0;
   constructor() {
     console.log("CExample");
-    this.getSize();
     this.init();
     // this.app.render();
   }
   init() {
     this.app = new Saber.App({
       el: "#canvas",
-      sw: this.sw,
-      sh: this.sh,
-      clearColor: [0.3, 0.3, 0.3, 1.0],
     });
     this.scene = new Saber.Scene();
 
     this.camera = new Saber.Camera({
       fovy: 45,
-      aspect: this.sw / this.sh,
-      near: 0.01,
-      far: 1000.0,
+      near: 0.1,
+      far: 10.0,
       pos: [0.0, 0.0, 3.0],
       center: [0.0, 0.0, 0.0],
       upDir: [0.0, 1.0, 0.0],
@@ -54,26 +47,18 @@ export default class CExample {
     const orad = 0.5;
     const color = [1.0, 1.0, 1.0, 1.0];
 
-    // const width = 1.0;
-    // const height = 0.5;
-    // const color = [1.0, 0.0, 0.0, 1.0];
-
     const geo = Saber.Geometry.torus(row, column, irad, orad, color);
-    // const geo = Saber.Geometry.plane(width, height, color);
     const shader = new Saber.Shader({ app, vs, fs });
     const mesh = new Saber.Mesh({
       app,
       geo,
       shader,
       attribute: {},
-      uniform: {},
+      uniform: {
+        uTime: true,
+      },
     });
     return mesh;
-  }
-
-  getSize() {
-    this.sw = window.innerWidth;
-    this.sh = window.innerHeight;
   }
 
   tick() {
@@ -81,6 +66,5 @@ export default class CExample {
 
     const { scene, camera } = this;
     this.app.render(scene, camera);
-    // this.mesh.quaternion.value = this.mesh.uniform.uTime.value;
   }
 }

@@ -4,12 +4,9 @@ export class App {
   sh = 0;
   gl = null;
 
-  constructor({ el, sw, sh, clearColor = [0.0, 0.0, 0.0, 1.0] }) {
+  constructor({ el, clearColor = [0.0, 0.0, 0.0, 0.0] }) {
     console.log("App");
-    // this.params = params;
     this.el = el;
-    this.sw = sw;
-    this.sh = sh;
     this.clearColor = clearColor;
     this.init();
   }
@@ -18,7 +15,11 @@ export class App {
     this.el = this.getRoot(this.el);
     this.gl = this.getContext();
     // window.Saber = window.Saber || this;
-    this.setSize(this.sw, this.sh);
+
+    // resize
+    this.eResize();
+    this.eResizeHandler = this.eResize.bind(this);
+    window.addEventListener("resize", this.eResizeHandler);
   }
 
   getRoot(el) {
@@ -42,10 +43,20 @@ export class App {
     }
   }
 
-  setSize(w, h) {
-    let { sw, sh } = this;
-    this.el.width = sw = w;
-    this.el.height = sh = h;
+  eResize() {
+    this.getSize();
+    this.setSize();
+  }
+
+  getSize() {
+    this.sw = window.innerWidth;
+    this.sh = window.innerHeight;
+  }
+
+  setSize() {
+    const { sw, sh } = this;
+    this.el.width = sw;
+    this.el.height = sh;
   }
 
   setupRendering() {
@@ -69,6 +80,7 @@ export class App {
     // rendering setup
     this.setupRendering();
 
+    camera.aspect = this.sw / this.sh;
     const v = camera.setupViewMatrix();
     const p = camera.setupProjectionMatrix();
 

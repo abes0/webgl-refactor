@@ -1,11 +1,13 @@
 export class Shader {
-  constructor(params) {
+  constructor({ app, vs, fs }) {
     console.log("Shader");
-    this.params = params;
+    this.app = app;
+    this.vs = vs;
+    this.fs = fs;
   }
 
   async init() {
-    const { app, vs, fs } = this.params;
+    const { app, vs, fs } = this;
     const { gl } = app;
     if (gl === null) {
       throw new Error("not initialized");
@@ -20,7 +22,7 @@ export class Shader {
   }
 
   loadShader(source) {
-    const { gl } = this.params.app;
+    const { gl } = this.app;
     return new Promise((resolve, reject) => {
       const isPath = /\.(glsl|frag|vert)$/.test(source);
       if (isPath) {
@@ -49,7 +51,7 @@ export class Shader {
   }
 
   createShaderObject(source, type) {
-    const { gl } = this.params.app;
+    const { gl } = this.app;
     const shader = gl.createShader(type);
     gl.shaderSource(shader, source);
     gl.compileShader(shader);

@@ -2,10 +2,9 @@ import { MathUtil } from "./MathUtil";
 const { Mat4, Vec3 } = MathUtil;
 
 export class Camera {
-  constructor({ fovy, aspect, near, far, pos, center, upDir }) {
+  constructor({ fovy, near, far, pos, center, upDir }) {
     console.log("Camera");
     this.fovy = fovy;
-    this.aspect = aspect;
     this.near = near;
     this.far = far;
     this.pos = { x: pos[0], y: pos[1], z: pos[2] };
