@@ -85,9 +85,10 @@ export class Mesh {
 
   setupModelMatrix() {
     let m = Mat4.identity();
-    m = this._rotate(m);
     m = this._scale(m);
     m = this._translate(m);
+    m = this._rotate(m);
+
     return m;
   }
 

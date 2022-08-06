@@ -9,6 +9,11 @@ export class Uniform {
         value: 0.0,
         scale: 1.0,
       },
+      uMousePos: {
+        isActive: false,
+        value: [0, 0],
+        scale: false,
+      },
     };
 
     this._setup(gl, program, uniform);
@@ -17,14 +22,18 @@ export class Uniform {
   _setup(gl, program, uniform) {
     for (const key in this._defaultPropertyManager) {
       if (uniform.hasOwnProperty(key)) {
+        uniform[key];
+        const target = this._defaultPropertyManager[key];
         if (typeof uniform[key] === "boolean") {
-          this._defaultPropertyManager[key].isActive = uniform[key];
+          target.isActive = uniform[key];
         } else if (typeof uniform[key] === "number") {
-          this._defaultPropertyManager[key].isActive = true;
-          this._defaultPropertyManager[key].scale = uniform[key];
+          target.isActive = true;
+          if (target.scale) {
+            target.scale = uniform[key];
+          }
         }
-        if (this._defaultPropertyManager[key].isActive) {
-          uniform[key] = this._defaultPropertyManager[key].value;
+        if (target.isActive) {
+          uniform[key] = target.value;
         } else {
           delete uniform[key];
         }
@@ -93,8 +102,12 @@ export class Uniform {
   _set(uniformObject) {
     for (const key in uniformObject) {
       if (!this.hasOwnProperty(key)) return;
-      this[key].value = this._defaultPropertyManager[key].value =
-        uniformObject[key] * this._defaultPropertyManager[key].scale;
+      const target = this._defaultPropertyManager[key];
+      if (target.scale) {
+        this[key].value = target.value = uniformObject[key] * target.scale;
+      } else {
+        this[key].value = target.value = uniformObject[key];
+      }
     }
   }
 
@@ -108,6 +121,5 @@ export class Uniform {
         gl[method](location, value);
       }
     });
-    console.log(this._defaultPropertyManager);
   }
 }

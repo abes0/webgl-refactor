@@ -12,7 +12,7 @@ export default class CExample {
     this.app = new Saber.App({
       el: "#canvas",
     });
-    this.scene = new Saber.Scene();
+    this.scene = new Saber.Scene(this.app);
 
     this.camera = new Saber.Camera({
       fovy: 45,
@@ -25,6 +25,7 @@ export default class CExample {
 
     this.mesh = this.createMesh();
     this.mesh.rotate.axis.z = 1;
+    this.mesh.rotate.axis.y = 1;
     this.mesh.rotate.value = 0.5;
     this.mesh.translate.x = 0.5;
 
@@ -55,6 +56,7 @@ export default class CExample {
       shader,
       attribute: {},
       uniform: {
+        uMousePos: true,
         uTime: true,
       },
     });
@@ -66,5 +68,8 @@ export default class CExample {
 
     const { scene, camera } = this;
     this.app.render(scene, camera);
+    if (this.mesh.uniform) {
+      this.mesh.rotate.value += 0.01;
+    }
   }
 }
