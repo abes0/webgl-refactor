@@ -7,3 +7,4 @@ export { Mesh } from "./Mesh";
 export { MathUtil } from "./MathUtil";
 export { Utils } from "./Utils";
 export { Camera } from "./Camera";
+export { Texture } from "./Texture";

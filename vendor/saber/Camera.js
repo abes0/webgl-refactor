@@ -1,8 +1,21 @@
 import { MathUtil } from "./MathUtil";
 const { Mat4, Vec3 } = MathUtil;
 
+const _FOV = 60;
+const _FOV_RAD = (_FOV / 2) * (Math.PI / 180);
+const _DIST = window.innerHeight / 2 / Math.tan(_FOV_RAD);
+
 export class Camera {
-  constructor({ fovy, near, far, pos, center, upDir }) {
+  constructor(
+    { fovy, near, far, pos, center, upDir } = {
+      fovy: _FOV,
+      near: 0.1,
+      far: _DIST * 2,
+      pos: [0, 0, _DIST],
+      center: [0, 0, 0],
+      upDir: [0, 1, 0],
+    }
+  ) {
     console.log("Camera");
     this.fovy = fovy;
     this.near = near;

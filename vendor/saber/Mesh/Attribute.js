@@ -9,6 +9,7 @@ export class Attribute {
       position: [geo.position, 3],
       normal: [geo.normal, 3],
       color: [geo.color, 4],
+      texCoord: [geo.texCoord, 2],
       ...attribute,
     };
     for (const key in _attr) {
@@ -19,6 +20,7 @@ export class Attribute {
       const location = this._getLocation(gl, program, key);
       this[key] = { location, vbo, value, stride };
     }
+    console.log(_attr);
     // return _attr;
   }
 

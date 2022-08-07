@@ -1,9 +1,9 @@
 export class Utils {
   static isInt(n) {
-    return Number.isInteger(n) && !Number.isFinite(n);
+    return Number(n) === n && n % 1 === 0;
   }
 
   static isFloat(n) {
-    return Number.isFinite(n) && !Number.isInteger(n);
+    return Number(n) === n && n % 1 !== 0;
   }
 }

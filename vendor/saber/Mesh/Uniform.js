@@ -6,7 +6,7 @@ export class Uniform {
     this._defaultPropertyManager = {
       uTime: {
         isActive: false,
-        value: 0.0,
+        value: 0.1,
         scale: 1.0,
       },
       uMousePos: {
@@ -15,14 +15,14 @@ export class Uniform {
         scale: false,
       },
     };
-
+    this._isSetupFinish = false;
     this._setup(gl, program, uniform);
   }
 
-  _setup(gl, program, uniform) {
+  async _setup(gl, program, uniform) {
+    // デフォルトのuniform設定 =========
     for (const key in this._defaultPropertyManager) {
       if (uniform.hasOwnProperty(key)) {
-        uniform[key];
         const target = this._defaultPropertyManager[key];
         if (typeof uniform[key] === "boolean") {
           target.isActive = uniform[key];
@@ -39,19 +39,73 @@ export class Uniform {
         }
       }
     }
-    const _uniform = {
-      mvpMatrix: new Float32Array([...Array(16).fill(0)]),
-      normalInverseMatrix: new Float32Array([...Array(16).fill(0)]),
-      ...uniform,
-    };
+    // ===============
 
-    for (const key in _uniform) {
+    uniform.mvpMatrix = new Float32Array([...Array(16).fill(0)]);
+    uniform.normalInverseMatrix = new Float32Array([...Array(16).fill(0)]);
+
+    for (const key in uniform) {
+      const target = uniform[key].constructor;
+      if (target && target.name === "Texture") {
+        console.log(uniform[key]);
+        await uniform[key].setup(gl);
+        const texture = uniform[key].getTextureObj();
+        console.log(texture);
+        uniform[key] = texture;
+      }
       const location = gl.getUniformLocation(program, key);
-      const value = _uniform[key];
+      const value = uniform[key];
       const method = this._getMethodType(value);
       this[key] = { location, value, method };
+      console.log(key);
     }
+    console.log(this);
+    this._isSetupFinish = true;
+
+    // await this._textureCheck(gl, uniform).then((uniform) => {
+    //   // const _uniform = {
+    //   //   mvpMatrix: new Float32Array([...Array(16).fill(0)]),
+    //   //   normalInverseMatrix: new Float32Array([...Array(16).fill(0)]),
+    //   //   ...uniform,
+    //   // };
+    //   console.log(uniform);
+    //   uniform.mvpMatrix = new Float32Array([...Array(16).fill(0)]);
+    //   uniform.normalInverseMatrix = new Float32Array([...Array(16).fill(0)]);
+
+    //   for (const key in uniform) {
+    //     const location = gl.getUniformLocation(program, key);
+    //     const value = uniform[key];
+    //     const method = this._getMethodType(value);
+    //     this[key] = { location, value, method };
+    //     console.log(key);
+    //   }
+    //   console.log("uniform おわり");
+    //   setTimeout(() => {
+    //     console.log(this);
+    //   }, 1000);
+    // });
+    // console.log(uniform);
   }
+
+  async _textureCheck(gl, uniform) {
+    return new Promise((resolve) => {
+      for (const key in uniform) {
+        const target = uniform[key];
+        if (target[0] && target[0].constructor.name === "Texture") {
+          target.forEach(async (item, index) => {
+            await item.setup(gl);
+            uniform[key + index] = item.getTextureObj();
+            console.log("texture1つ", uniform[key + index]);
+          });
+          delete uniform[key];
+          console.log("textureの設定");
+          resolve(uniform);
+        }
+      }
+    });
+  }
+
+  // async _
 
   _getMethodType(value) {
     let tmp = "uniform";
@@ -89,9 +143,9 @@ export class Uniform {
         tmp += "fv";
       } else {
         tmp += "1";
-        if (U.isInteger) {
+        if (U.isInt(value) || type === "WebGLTexture") {
           tmp += "i";
-        } else if (U.isFloat) {
+        } else if (U.isFloat(value)) {
           tmp += "f";
         }
       }
@@ -115,6 +169,12 @@ export class Uniform {
     Object.keys(this).forEach((key) => {
       if (key.charAt(0) === "_") return;
       const { location, value, method } = this[key];
+
+      if (value.constructor && value.constructor.name === "WebGLTexture") {
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, value);
+      }
+
       if (method.includes("Matrix")) {
         gl[method](location, false, value);
       } else {

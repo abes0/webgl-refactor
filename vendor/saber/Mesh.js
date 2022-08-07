@@ -159,12 +159,13 @@ export class Mesh {
   }
 
   render(gl, v, p) {
-    if (!this.uniform) return;
+    if (!this.uniform || !this.uniform._isSetupFinish) return;
     // const nowTime = (new Date() - this.startTime) * 0.001;
     const m = this.setupModelMatrix();
     const mvp = this.setupMVP(m, v, p);
     const normalInverseMatrix = Mat4.transpose(Mat4.inverse(m));
 
+    console.log(this.uniform.normalInverseMatrix);
     this.uniform.normalInverseMatrix.value = normalInverseMatrix;
     this.uniform.mvpMatrix.value = mvp;
 
