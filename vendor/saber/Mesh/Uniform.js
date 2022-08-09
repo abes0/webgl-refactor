@@ -56,6 +56,9 @@ export class Uniform {
       console.log(
         "_setup in uniform",
         "CubeMap",
+        key,
+        target,
+        target.name,
         target && target.name === "CubeMap"
       );
       if (target && target.name === "CubeMap") {
