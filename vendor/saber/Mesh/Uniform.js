@@ -17,6 +17,7 @@ export class Uniform {
     };
     this._isSetupFinish = false;
     this._setup(gl, program, uniform);
+    console.log(this);
   }
 
   async _setup(gl, program, uniform) {
@@ -41,71 +42,30 @@ export class Uniform {
     }
     // ===============
 
+    uniform.mMatrix = new Float32Array([...Array(16).fill(0)]);
     uniform.mvpMatrix = new Float32Array([...Array(16).fill(0)]);
     uniform.normalInverseMatrix = new Float32Array([...Array(16).fill(0)]);
 
     for (const key in uniform) {
       const target = uniform[key].constructor;
       if (target && target.name === "Texture") {
-        console.log(uniform[key]);
         await uniform[key].setup(gl);
         const texture = uniform[key].getTextureObj();
-        console.log(texture);
+        uniform[key] = texture;
+      }
+      if (target && target.name === "CubeMap") {
+        await uniform[key].setup(gl);
+        const texture = uniform[key].getCubeMapObj();
+        texture.__cubeMap__ = true;
         uniform[key] = texture;
       }
       const location = gl.getUniformLocation(program, key);
       const value = uniform[key];
       const method = this._getMethodType(value);
       this[key] = { location, value, method };
-      console.log(key);
     }
-    console.log(this);
     this._isSetupFinish = true;
-
-    // await this._textureCheck(gl, uniform).then((uniform) => {
-    //   // const _uniform = {
-    //   //   mvpMatrix: new Float32Array([...Array(16).fill(0)]),
-    //   //   normalInverseMatrix: new Float32Array([...Array(16).fill(0)]),
-    //   //   ...uniform,
-    //   // };
-    //   console.log(uniform);
-    //   uniform.mvpMatrix = new Float32Array([...Array(16).fill(0)]);
-    //   uniform.normalInverseMatrix = new Float32Array([...Array(16).fill(0)]);
-
-    //   for (const key in uniform) {
-    //     const location = gl.getUniformLocation(program, key);
-    //     const value = uniform[key];
-    //     const method = this._getMethodType(value);
-    //     this[key] = { location, value, method };
-    //     console.log(key);
-    //   }
-    //   console.log("uniform おわり");
-    //   setTimeout(() => {
-    //     console.log(this);
-    //   }, 1000);
-    // });
-    // console.log(uniform);
   }
-
-  async _textureCheck(gl, uniform) {
-    return new Promise((resolve) => {
-      for (const key in uniform) {
-        const target = uniform[key];
-        if (target[0] && target[0].constructor.name === "Texture") {
-          target.forEach(async (item, index) => {
-            await item.setup(gl);
-            uniform[key + index] = item.getTextureObj();
-            console.log("texture1つ", uniform[key + index]);
-          });
-          delete uniform[key];
-          console.log("textureの設定");
-          resolve(uniform);
-        }
-      }
-    });
-  }
-
-  // async _
 
   _getMethodType(value) {
     let tmp = "uniform";
@@ -143,7 +103,11 @@ export class Uniform {
         tmp += "fv";
       } else {
         tmp += "1";
-        if (U.isInt(value) || type === "WebGLTexture") {
+        if (
+          U.isInt(value) ||
+          type === "WebGLTexture" ||
+          typeof value === "boolean"
+        ) {
           tmp += "i";
         } else if (U.isFloat(value)) {
           tmp += "f";
@@ -172,7 +136,12 @@ export class Uniform {
 
       if (value.constructor && value.constructor.name === "WebGLTexture") {
         gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, value);
+
+        if (value.__cubeMap__) {
+          gl.bindTexture(gl.TEXTURE_CUBE_MAP, value);
+        } else {
+          gl.bindTexture(gl.TEXTURE_2D, value);
+        }
       }
 
       if (method.includes("Matrix")) {

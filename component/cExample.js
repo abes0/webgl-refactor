@@ -16,11 +16,32 @@ export default class CExample {
 
     this.camera = new Saber.Camera();
 
-    this.mesh = this.createMesh();
-    this.mesh.rotate.axis.z = 1;
-    this.mesh.rotate.axis.y = 1;
-    this.mesh.rotate.value = 0.5;
-    this.mesh.translate.x = 0.5;
+    this.cube = this.createCube();
+    this.cube.rotate.axis.x = 1;
+    // this.cube.rotate.axis.y = 1;
+
+    this.torus = this.createTorus();
+    this.torus.rotate.axis.z = 1;
+    this.torus.rotate.axis.y = 1;
+    this.torus.translate.x = -250;
+
+    this.sphere = this.createSphere();
+    this.sphere.rotate.axis.z = 1;
+    this.sphere.rotate.axis.y = 1;
+    this.sphere.translate.x = -250;
+    // this.sphere.translate.x = -50;
+    // this.mesh.rotate.value = 0.5;
+    // this.mesh.translate.x = 0.5;
+
+    this.torus02 = this.createTorus();
+    this.torus02.rotate.axis.z = 1;
+    this.torus02.rotate.axis.y = 1;
+    this.torus02.translate.x = 250;
+
+    this.box = this.createBox();
+    this.box.rotate.axis.z = 1;
+    this.box.rotate.axis.y = 1;
+    this.box.translate.x = 250;
 
     // this.mesh_ = this.createMesh();
     // this.mesh_.rotate.axis.x = 1;
@@ -30,23 +51,23 @@ export default class CExample {
     // this.mesh_.scale.x = 1.5;
     // this.mesh_.scale.y = 0.5;
 
-    this.scene.add(this.mesh);
+    // this.
+
+    this.scene.add(this.cube);
+    this.scene.add(this.torus);
+    this.scene.add(this.sphere);
+    this.scene.add(this.torus02);
+    this.scene.add(this.box);
+
     // this.scene.add(this.mesh_);
 
     this.tick();
   }
 
-  createMesh() {
+  createCube() {
     const { app } = this;
-    const row = 32;
-    const column = 32;
-    const irad = 10;
-    const orad = 200;
-    const color = [1.0, 1.0, 1.0, 1.0];
 
-    // const geo = Saber.Geometry.torus(row, column, irad, orad, color);
-
-    const geo = Saber.Geometry.plane(500, 500 * (9 / 16), [1, 1, 1, 1]);
+    const geo = Saber.Geometry.cube(450, [1, 1, 1, 1]);
     const shader = new Saber.Shader({ app, vs, fs });
     const mesh = new Saber.Mesh({
       app,
@@ -54,10 +75,137 @@ export default class CExample {
       shader,
       attribute: {},
       uniform: {
-        uTexture0: new Saber.Texture("../img/sample.jpg"),
+        uTexture0: new Saber.CubeMap([
+          "../img/posx.jpg",
+          "../img/posy.jpg",
+          "../img/posz.jpg",
+          "../img/negx.jpg",
+          "../img/negy.jpg",
+          "../img/negz.jpg",
+        ]),
+        // uTexture0: new Saber.Texture("../img/sample.jpg"),
         uMousePos: true,
         uTime: true,
+        eyePos: this.camera.getPos(),
+        refraction: false,
+        refractiveIndex: 1.1,
       },
+      cullFace: "FRONT",
+      depthMask: false,
+      isCubeMap: true,
+    });
+    return mesh;
+  }
+
+  createTorus() {
+    const { app } = this;
+    const row = 32;
+    const column = 32;
+    const irad = 20;
+    const orad = 150;
+    const color = [1.0, 1.0, 1.0, 1.0];
+
+    const geo = Saber.Geometry.torus(row, column, irad, orad, color);
+
+    // const geo = Saber.Geometry.plane(500, 500 * (9 / 16), [1, 1, 1, 1]);
+    const shader = new Saber.Shader({ app, vs, fs });
+    const mesh = new Saber.Mesh({
+      app,
+      geo,
+      shader,
+      attribute: {},
+      uniform: {
+        uTexture0: new Saber.CubeMap([
+          "../img/posx.jpg",
+          "../img/posy.jpg",
+          "../img/posz.jpg",
+          "../img/negx.jpg",
+          "../img/negy.jpg",
+          "../img/negz.jpg",
+        ]),
+        // uTexture0: new Saber.Texture("../img/sample.jpg"),
+        uMousePos: true,
+        uTime: true,
+        eyePos: this.camera.getPos(),
+        refraction: true,
+        refractiveIndex: 1.1,
+      },
+      cullFace: "BACK",
+      depthMask: true,
+    });
+    return mesh;
+  }
+
+  createSphere() {
+    const { app } = this;
+    const row = 32;
+    const column = 32;
+    const size = 60.0;
+    const color = [1.0, 1.0, 1.0, 1.0];
+
+    const geo = Saber.Geometry.sphere(row, column, size, color);
+
+    // const geo = Saber.Geometry.plane(500, 500 * (9 / 16), [1, 1, 1, 1]);
+    const shader = new Saber.Shader({ app, vs, fs });
+    const mesh = new Saber.Mesh({
+      app,
+      geo,
+      shader,
+      attribute: {},
+      uniform: {
+        uTexture0: new Saber.CubeMap([
+          "../img/posx.jpg",
+          "../img/posy.jpg",
+          "../img/posz.jpg",
+          "../img/negx.jpg",
+          "../img/negy.jpg",
+          "../img/negz.jpg",
+        ]),
+        // uTexture0: new Saber.Texture("../img/sample.jpg"),
+        uMousePos: true,
+        uTime: true,
+        eyePos: this.camera.getPos(),
+        refraction: true,
+        refractiveIndex: 1.1,
+      },
+      cullFace: "BACK",
+      depthMask: true,
+    });
+    return mesh;
+  }
+
+  createBox() {
+    const { app } = this;
+    const size = 80.0;
+    const color = [1.0, 1.0, 1.0, 1.0];
+
+    const geo = Saber.Geometry.cube(size, color);
+
+    // const geo = Saber.Geometry.plane(500, 500 * (9 / 16), [1, 1, 1, 1]);
+    const shader = new Saber.Shader({ app, vs, fs });
+    const mesh = new Saber.Mesh({
+      app,
+      geo,
+      shader,
+      attribute: {},
+      uniform: {
+        uTexture0: new Saber.CubeMap([
+          "../img/posx.jpg",
+          "../img/posy.jpg",
+          "../img/posz.jpg",
+          "../img/negx.jpg",
+          "../img/negy.jpg",
+          "../img/negz.jpg",
+        ]),
+        // uTexture0: new Saber.Texture("../img/sample.jpg"),
+        uMousePos: true,
+        uTime: true,
+        eyePos: this.camera.getPos(),
+        refraction: true,
+        refractiveIndex: 1.08,
+      },
+      cullFace: "BACK",
+      depthMask: true,
     });
     return mesh;
   }
@@ -67,8 +215,12 @@ export default class CExample {
 
     const { scene, camera } = this;
     this.app.render(scene, camera);
-    if (this.mesh.uniform) {
-      this.mesh.rotate.value += 0.01;
+    if (this.torus.uniform) {
+      this.torus.rotate.value += 0.01;
+      this.sphere.rotate.value += 0.01;
+      this.torus02.rotate.value += 0.01;
+      this.box.rotate.value += 0.01;
+      // this.cube.rotate.value += 0.01;
       // this.mesh_.rotate.value -= 0.01;
     }
   }

@@ -20,6 +20,9 @@ export class App {
     this.eResize();
     this.eResizeHandler = this.eResize.bind(this);
     window.addEventListener("resize", this.eResizeHandler);
+
+    this.gl.enable(this.gl.CULL_FACE);
+    this.gl.enable(this.gl.DEPTH_TEST);
   }
 
   getRoot(el) {
@@ -71,8 +74,7 @@ export class App {
     );
     gl.clearDepth(1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    gl.disable(gl.CULL_FACE);
-    // gl.cullFace(gl.BACK_AND_FRONT);
+    // gl.disable(gl.CULL_FACE);
     gl.enable(gl.DEPTH_TEST);
   }
 

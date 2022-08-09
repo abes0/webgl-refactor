@@ -39,4 +39,8 @@ export class Camera {
     const p = Mat4.perspective(fovy, aspect, near, far);
     return p;
   }
+
+  getPos() {
+    return [this.pos.x, this.pos.y, this.pos.z];
+  }
 }

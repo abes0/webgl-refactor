@@ -5,13 +5,25 @@ import { Attribute } from "./Mesh/Attribute";
 const { Mat4, Vec3 } = MathUtil;
 
 export class Mesh {
-  constructor({ app, geo, shader, attribute, uniform }) {
+  constructor({
+    app,
+    geo,
+    shader,
+    attribute,
+    uniform,
+    cullFace = "BACK",
+    depthMask = true,
+    isCubeMap = false,
+  }) {
     console.log("Mesh");
     this.app = app;
     this.geo = geo;
     this.shader = shader;
     this.initialAttribute = attribute;
     this.initialUniform = uniform;
+    this.cullFace = cullFace;
+    this.depthMask = depthMask;
+    this.isCubeMap = isCubeMap;
 
     this.rotate = {
       axis: { x: 0.0, y: 0.0, z: 0.0 },
@@ -161,18 +173,35 @@ export class Mesh {
   render(gl, v, p) {
     if (!this.uniform || !this.uniform._isSetupFinish) return;
     // const nowTime = (new Date() - this.startTime) * 0.001;
+    gl.useProgram(this.program);
+
+    this.attribute._enable(gl);
+
+    // if (this.cullFace === "FRONT") {
+    //   gl.enable(gl.CULL_FACE);
+    // }
+    // if (this.cullFace === "BACK") {
+    //   gl.disable(gl.CULL_FACE);
+    // }
+    gl.cullFace(gl[this.cullFace]);
+    gl.depthMask(this.depthMask);
+
     const m = this.setupModelMatrix();
     const mvp = this.setupMVP(m, v, p);
     const normalInverseMatrix = Mat4.transpose(Mat4.inverse(m));
+    if (this.isCubeMap) {
+      mvp[12] = 0.0;
+      mvp[13] = 0.0;
+      mvp[14] = 0.0;
+      mvp[15] = 1.0;
+    }
 
-    console.log(this.uniform.normalInverseMatrix);
+    this.uniform.mMatrix.value = m;
     this.uniform.normalInverseMatrix.value = normalInverseMatrix;
     this.uniform.mvpMatrix.value = mvp;
 
-    gl.useProgram(this.program);
-
     this.uniform._enable(gl);
-    this.attribute._enable(gl);
+
     if (this.ibo) gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.ibo);
 
     gl.drawElements(gl.TRIANGLES, this.geo.index.length, gl.UNSIGNED_SHORT, 0);
