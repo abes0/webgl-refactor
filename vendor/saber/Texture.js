@@ -1,6 +1,7 @@
 export class Texture {
   constructor(path, option = {}) {
-    console.log("Texture");
+    this.name = "Texture";
+    console.log(this.name);
     this.path = path;
   }
 

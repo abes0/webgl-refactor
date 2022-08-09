@@ -1,6 +1,7 @@
 export class CubeMap {
   constructor(pathArray, option = {}) {
-    console.log("CubeMap");
+    this.name = "CubeMap";
+    console.log(this.name);
     this.pathArray = pathArray;
   }
 

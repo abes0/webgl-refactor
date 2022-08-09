@@ -47,7 +47,7 @@ export class Uniform {
     uniform.normalInverseMatrix = new Float32Array([...Array(16).fill(0)]);
 
     for (const key in uniform) {
-      const target = uniform[key].constructor;
+      const target = uniform[key];
       if (target && target.name === "Texture") {
         await uniform[key].setup(gl);
         const texture = uniform[key].getTextureObj();
