@@ -1,6 +1,12 @@
 import * as Saber from "../vendor/saber";
 import vs from "../glsl/main.vert?raw";
 import fs from "../glsl/main.frag?raw";
+import imgPosX from "../img/posx.jpg";
+import imgPosY from "../img/posy.jpg";
+import imgPosZ from "../img/posz.jpg";
+import imgNegX from "../img/negx.jpg";
+import imgNegY from "../img/negy.jpg";
+import imgNegZ from "../img/negz.jpg";
 
 export default class CExample {
   constructor() {
@@ -76,12 +82,12 @@ export default class CExample {
       attribute: {},
       uniform: {
         uTexture0: new Saber.CubeMap([
-          "../img/posx.jpg",
-          "../img/posy.jpg",
-          "../img/posz.jpg",
-          "../img/negx.jpg",
-          "../img/negy.jpg",
-          "../img/negz.jpg",
+          imgPosX,
+          imgPosY,
+          imgPosZ,
+          imgNegX,
+          imgNegY,
+          imgNegZ,
         ]),
         // uTexture0: new Saber.Texture("../img/sample.jpg"),
         uMousePos: true,
@@ -116,12 +122,12 @@ export default class CExample {
       attribute: {},
       uniform: {
         uTexture0: new Saber.CubeMap([
-          "../img/posx.jpg",
-          "../img/posy.jpg",
-          "../img/posz.jpg",
-          "../img/negx.jpg",
-          "../img/negy.jpg",
-          "../img/negz.jpg",
+          imgPosX,
+          imgPosY,
+          imgPosZ,
+          imgNegX,
+          imgNegY,
+          imgNegZ,
         ]),
         // uTexture0: new Saber.Texture("../img/sample.jpg"),
         uMousePos: true,
@@ -154,12 +160,12 @@ export default class CExample {
       attribute: {},
       uniform: {
         uTexture0: new Saber.CubeMap([
-          "../img/posx.jpg",
-          "../img/posy.jpg",
-          "../img/posz.jpg",
-          "../img/negx.jpg",
-          "../img/negy.jpg",
-          "../img/negz.jpg",
+          imgPosX,
+          imgPosY,
+          imgPosZ,
+          imgNegX,
+          imgNegY,
+          imgNegZ,
         ]),
         // uTexture0: new Saber.Texture("../img/sample.jpg"),
         uMousePos: true,
@@ -190,12 +196,12 @@ export default class CExample {
       attribute: {},
       uniform: {
         uTexture0: new Saber.CubeMap([
-          "../img/posx.jpg",
-          "../img/posy.jpg",
-          "../img/posz.jpg",
-          "../img/negx.jpg",
-          "../img/negy.jpg",
-          "../img/negz.jpg",
+          imgPosX,
+          imgPosY,
+          imgPosZ,
+          imgNegX,
+          imgNegY,
+          imgNegZ,
         ]),
         // uTexture0: new Saber.Texture("../img/sample.jpg"),
         uMousePos: true,
