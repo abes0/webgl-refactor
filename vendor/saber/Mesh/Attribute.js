@@ -20,7 +20,6 @@ export class Attribute {
       const location = this._getLocation(gl, program, key);
       this[key] = { location, vbo, value, stride };
     }
-    console.log(_attr);
     // return _attr;
   }
 

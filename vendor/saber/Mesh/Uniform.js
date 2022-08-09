@@ -53,14 +53,6 @@ export class Uniform {
         const texture = uniform[key].getTextureObj();
         uniform[key] = texture;
       }
-      console.log(
-        "_setup in uniform",
-        "CubeMap",
-        key,
-        target,
-        target.name,
-        target && target.name === "CubeMap"
-      );
       if (target && target.name === "CubeMap") {
         await uniform[key].setup(gl);
         const texture = uniform[key].getCubeMapObj();
@@ -155,7 +147,6 @@ export class Uniform {
       if (method.includes("Matrix")) {
         gl[method](location, false, value);
       } else {
-        console.log(key, location, value, method, gl[method]);
         gl[method](location, value);
       }
     });
