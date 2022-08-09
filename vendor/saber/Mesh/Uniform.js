@@ -147,7 +147,7 @@ export class Uniform {
       if (method.includes("Matrix")) {
         gl[method](location, false, value);
       } else {
-        console.log(gl[method]);
+        console.log(key, location, value, method, gl[method]);
         gl[method](location, value);
       }
     });
