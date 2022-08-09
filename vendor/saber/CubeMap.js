@@ -16,13 +16,14 @@ export class CubeMap {
 
     const prmiseArray = this.pathArray.map((path) => this.load(path));
     const imagesArray = await Promise.all(prmiseArray);
-    this.CubeMapObjectArray = await this.createCubeMap(
-      gl,
-      imagesArray,
-      targetArray
-    );
+    // this.CubeMapObjectArray = await this.createCubeMap(
+    //   gl,
+    //   imagesArray,
+    //   targetArray
+    // );
     // console.log(this.images);
     // this.createCubeMap(gl);
+    this.createCubeMap(gl, imagesArray, targetArray);
   }
 
   load(path) {
@@ -76,6 +77,7 @@ export class CubeMap {
   }
 
   getCubeMapObj() {
+    console.log("getCubeMapObj", this.cubeMapObj);
     return this.cubeMapObj;
   }
 }
