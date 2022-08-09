@@ -17,7 +17,7 @@ export class Uniform {
     };
     this._isSetupFinish = false;
     this._setup(gl, program, uniform);
-    console.log(this);
+    // console.log(this);
   }
 
   async _setup(gl, program, uniform) {
@@ -53,6 +53,11 @@ export class Uniform {
         const texture = uniform[key].getTextureObj();
         uniform[key] = texture;
       }
+      console.log(
+        "_setup in uniform",
+        "CubeMap",
+        target && target.name === "CubeMap"
+      );
       if (target && target.name === "CubeMap") {
         await uniform[key].setup(gl);
         const texture = uniform[key].getCubeMapObj();
