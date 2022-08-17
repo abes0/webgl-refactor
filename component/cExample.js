@@ -7,9 +7,10 @@ import imgPosZ from "../img/posz.jpg";
 import imgNegX from "../img/negx.jpg";
 import imgNegY from "../img/negy.jpg";
 import imgNegZ from "../img/negz.jpg";
-import gltfDuck from "../gltf/Duck.gltf?raw";
+import gltfDuck_url from "../gltf/Duck.gltf?url";
+import gltfDuck_bin from "../gltf/Duck_data.bin?url";
 
-const gltfDuck_url = "../gltf/Duck.gltf";
+// const gltfDuck_url = "../gltf/Duck.gltf";
 
 export default class CExample {
   constructor() {
