@@ -38,6 +38,7 @@ void main(){
 
   vec4 envColor = textureCube(uTexture0, refractVec);
   gl_FragColor = envColor;
+  // gl_FragColor = vec4(1.0, 0, 0, 0.);
 
 }
 

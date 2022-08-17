@@ -2,9 +2,10 @@ export class Attribute {
   constructor(gl, geo, program, attribute) {
     console.log("Attribute");
     this._setup(gl, geo, program, attribute);
+    // this._setup(gl, geo, program, attribute, geo.name && geo.name === 'GLTFLoader');
   }
 
-  _setup(gl, geo, program, attribute) {
+  _setup(gl, geo, program, attribute, gltf = false) {
     const _attr = {
       position: [geo.position, 3],
       normal: [geo.normal, 3],
@@ -16,19 +17,22 @@ export class Attribute {
       const target = _attr[key];
       const value = target[0];
       const stride = target[1];
-      const vbo = this._createVBO(gl, value);
+      const vbo = this._createVBO(gl, value, key);
       const location = this._getLocation(gl, program, key);
       this[key] = { location, vbo, value, stride };
     }
     // return _attr;
   }
 
-  _createVBO(gl, vertexArray) {
+  _createVBO(gl, vertexArray, key) {
     const vbo = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+    // console.log(key, vertexArray);
+    const isFloat32Array =
+      vertexArray && vertexArray.constructor.name === "Float32Array";
     gl.bufferData(
       gl.ARRAY_BUFFER,
-      new Float32Array(vertexArray),
+      isFloat32Array ? vertexArray : new Float32Array(vertexArray),
       gl.STATIC_DRAW
     );
     gl.bindBuffer(gl.ARRAY_BUFFER, null);

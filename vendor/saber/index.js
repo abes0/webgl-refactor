@@ -9,3 +9,4 @@ export { Utils } from "./Utils";
 export { Camera } from "./Camera";
 export { Texture } from "./Texture";
 export { CubeMap } from "./CubeMap";
+export { GLTFLoader } from "./GLTFLoader";

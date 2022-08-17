@@ -86,9 +86,11 @@ export class Mesh {
   createIBO(gl, indexArray) {
     const ibo = gl.createBuffer();
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo);
+    const isUint16Array =
+      indexArray && indexArray.constructor.name === "Uint16Array";
     gl.bufferData(
       gl.ELEMENT_ARRAY_BUFFER,
-      new Int16Array(indexArray),
+      isUint16Array ? indexArray : new Int16Array(indexArray),
       gl.STATIC_DRAW
     );
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);

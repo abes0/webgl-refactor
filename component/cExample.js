@@ -13,7 +13,7 @@ export default class CExample {
     console.log("CExample");
     this.init();
   }
-  init() {
+  async init() {
     this.app = new Saber.App({
       el: "#canvas",
       clearColor: [0.6, 0.6, 0.6, 1],
@@ -21,6 +21,9 @@ export default class CExample {
     this.scene = new Saber.Scene(this.app);
 
     this.camera = new Saber.Camera();
+
+    // const gltf = new Saber.GLTFLoader("../gltf/Duck.gltf");
+    // gltf.load();
 
     this.cube = this.createCube();
     this.cube.rotate.axis.x = 1;
@@ -49,6 +52,11 @@ export default class CExample {
     this.box.rotate.axis.y = 1;
     this.box.translate.x = 250;
 
+    this.duck = await this.createGltf();
+    this.duck.rotate.axis.z = 1;
+    this.duck.rotate.axis.y = 1;
+    this.duck.translate.x = 0;
+
     // this.mesh_ = this.createMesh();
     // this.mesh_.rotate.axis.x = 1;
     // this.mesh_.rotate.axis.y = 1;
@@ -64,6 +72,7 @@ export default class CExample {
     this.scene.add(this.sphere);
     this.scene.add(this.torus02);
     this.scene.add(this.box);
+    this.scene.add(this.duck);
 
     // this.scene.add(this.mesh_);
 
@@ -103,6 +112,42 @@ export default class CExample {
     return mesh;
   }
 
+  async createGltf() {
+    const { app } = this;
+    const gltf = new Saber.GLTFLoader("../gltf/Duck.gltf");
+    await gltf.load();
+    const data = gltf.getMoldData();
+    console.log(data);
+
+    // const geo = Saber.Geometry.plane(500, 500 * (9 / 16), [1, 1, 1, 1]);
+    const shader = new Saber.Shader({ app, vs, fs });
+    const mesh = new Saber.Mesh({
+      app,
+      geo: data,
+      shader,
+      attribute: {},
+      uniform: {
+        uTexture0: new Saber.CubeMap([
+          imgPosX,
+          imgPosY,
+          imgPosZ,
+          imgNegX,
+          imgNegY,
+          imgNegZ,
+        ]),
+        // uTexture0: new Saber.Texture("../img/sample.jpg"),
+        uMousePos: true,
+        uTime: true,
+        eyePos: this.camera.getPos(),
+        refraction: true,
+        refractiveIndex: 1.1,
+      },
+      cullFace: "BACK",
+      depthMask: true,
+    });
+    return mesh;
+  }
+
   createTorus() {
     const { app } = this;
     const row = 32;
@@ -112,6 +157,7 @@ export default class CExample {
     const color = [1.0, 1.0, 1.0, 1.0];
 
     const geo = Saber.Geometry.torus(row, column, irad, orad, color);
+    console.log(geo);
 
     // const geo = Saber.Geometry.plane(500, 500 * (9 / 16), [1, 1, 1, 1]);
     const shader = new Saber.Shader({ app, vs, fs });
@@ -226,6 +272,7 @@ export default class CExample {
       this.sphere.rotate.value += 0.01;
       this.torus02.rotate.value += 0.01;
       this.box.rotate.value += 0.01;
+      this.duck.rotate.value += 0.01;
       // this.cube.rotate.value += 0.01;
       // this.mesh_.rotate.value -= 0.01;
     }
