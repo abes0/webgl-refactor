@@ -66,16 +66,18 @@ export class GLTFLoader {
     );
     console.log(this.index);
 
-    this.position = new Float32Array(
-      b,
-      this.container.position.accessor.byteOffset,
-      this.container.position.stride * this.container.position.accessor.count
-    );
-
     this.normal = new Float32Array(
       b,
-      this.container.normal.accessor.byteOffset,
+      this.container.normal.byteOffset +
+        this.container.normal.accessor.byteOffset,
       this.container.normal.stride * this.container.normal.accessor.count
+    );
+
+    this.position = new Float32Array(
+      b,
+      this.container.position.byteOffset +
+        this.container.position.accessor.byteOffset,
+      this.container.position.stride * this.container.position.accessor.count
     );
 
     console.log(this.container);
