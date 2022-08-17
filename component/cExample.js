@@ -57,9 +57,10 @@ export default class CExample {
     this.box.translate.x = 250;
 
     this.duck = await this.createGltf();
-    this.duck.rotate.axis.z = 1;
+    this.duck.rotate.axis.z = 0.3;
+    this.duck.rotate.axis.x = 0.3;
     this.duck.rotate.axis.y = 1;
-    this.duck.translate.x = 0;
+    this.duck.translate.y = -50;
 
     // this.mesh_ = this.createMesh();
     // this.mesh_.rotate.axis.x = 1;
