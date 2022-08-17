@@ -58,6 +58,7 @@ export class Mesh {
 
     // uniform
     this.uniform = new Uniform(gl, this.program, initialUniform);
+    console.log(this.uniform);
   }
 
   createProgramObject(gl, vsObject, fsObject) {

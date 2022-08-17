@@ -3,6 +3,9 @@ export class CubeMap {
     this.name = "CubeMap";
     console.log(this.name);
     this.pathArray = pathArray;
+    this.option = option;
+    this.option.slot = this.option.slot ? this.option.slot : 0;
+    this.option.slotText = "TEXTURE" + this.option.slot;
   }
 
   async setup(gl) {
@@ -43,9 +46,11 @@ export class CubeMap {
   }
 
   async createCubeMap(gl, imagesArray, targetArray) {
+    const { slot, slotText } = this.option;
     return new Promise((resolve) => {
       const texture = gl.createTexture();
-      gl.activeTexture(gl.TEXTURE0);
+      gl.activeTexture(gl[slotText]);
+      console.log("abababababa", gl.getParameter(gl.ACTIVE_TEXTURE));
       gl.bindTexture(gl.TEXTURE_CUBE_MAP, texture);
       targetArray.forEach((item, index) => {
         gl.texImage2D(
@@ -72,6 +77,9 @@ export class CubeMap {
         gl.CLAMP_TO_EDGE
       );
       gl.bindTexture(gl.TEXTURE_CUBE_MAP, null);
+      texture.__isCubeMap__ = true;
+      texture.__slotText__ = slotText;
+      texture.__slot__ = slot;
       this.cubeMapObj = texture;
       resolve();
     });

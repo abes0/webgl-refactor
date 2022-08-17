@@ -56,7 +56,6 @@ export class Uniform {
       if (target && target.name === "CubeMap") {
         await uniform[key].setup(gl);
         const texture = uniform[key].getCubeMapObj();
-        texture.__cubeMap__ = true;
         uniform[key] = texture;
       }
       const location = gl.getUniformLocation(program, key);
@@ -135,19 +134,26 @@ export class Uniform {
       const { location, value, method } = this[key];
 
       if (value.constructor && value.constructor.name === "WebGLTexture") {
-        gl.activeTexture(gl.TEXTURE0);
+        //====
+        // texture系
+        //====
+        gl.activeTexture(gl[value.__slotText__]);
 
-        if (value.__cubeMap__) {
+        if (value.__isCubeMap__) {
           gl.bindTexture(gl.TEXTURE_CUBE_MAP, value);
         } else {
           gl.bindTexture(gl.TEXTURE_2D, value);
         }
-      }
-
-      if (method.includes("Matrix")) {
-        gl[method](location, false, value);
+        gl[method](location, value.__slot__);
       } else {
-        gl[method](location, value);
+        //====
+        // texture以外
+        //====
+        if (method.includes("Matrix")) {
+          gl[method](location, false, value);
+        } else {
+          gl[method](location, value);
+        }
       }
     });
   }
