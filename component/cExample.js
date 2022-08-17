@@ -7,6 +7,9 @@ import imgPosZ from "../img/posz.jpg";
 import imgNegX from "../img/negx.jpg";
 import imgNegY from "../img/negy.jpg";
 import imgNegZ from "../img/negz.jpg";
+import gltfDuck from "../gltf/Duck.gltf?raw";
+
+const gltfDuck_url = "../gltf/Duck.gltf";
 
 export default class CExample {
   constructor() {
@@ -114,7 +117,7 @@ export default class CExample {
 
   async createGltf() {
     const { app } = this;
-    const gltf = new Saber.GLTFLoader("../gltf/Duck.gltf");
+    const gltf = new Saber.GLTFLoader(gltfDuck_url);
     await gltf.load();
     const data = gltf.getMoldData();
     console.log(data);
