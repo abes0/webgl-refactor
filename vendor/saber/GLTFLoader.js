@@ -28,10 +28,11 @@ const WEBGL_TYPE_SIZES = {
 };
 
 export class GLTFLoader {
-  constructor(path) {
+  constructor(path, binPath) {
     this.name = "GLTFLoader";
     console.log(this.name);
     this.path = path;
+    this.binPath = binPath;
     this.pathWhere = path.substr(0, path.lastIndexOf("/") + 1);
     console.log(this.pathWhere);
     this.requestHeader = {};
@@ -46,9 +47,9 @@ export class GLTFLoader {
 
   async load() {
     const data = await this.glTFParser(this.path);
-    const bufferURI = data.buffers[0].uri;
+    // const bufferURI = data.buffers[0].uri;
     console.log(data);
-    const b = await this.binaryParser(this.pathWhere + bufferURI);
+    const b = await this.binaryParser(this.binPath);
     // const b = await this.loadFile(this.pathWhere + bufferURI);
     console.log(b);
     const primitiveObj = data.meshes[0].primitives[0];
