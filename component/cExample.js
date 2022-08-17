@@ -30,7 +30,7 @@ export default class CExample {
     // gltf.load();
 
     this.cube = this.createCube();
-    this.cube.rotate.axis.x = 1;
+    this.cube.rotate.axis.y = 1;
     // this.cube.rotate.axis.y = 1;
 
     this.torus = this.createTorus();
@@ -119,17 +119,14 @@ export default class CExample {
 
   async createGltf() {
     const { app } = this;
-    console.log(gltfDuck_url, gltfDuck_bin);
-    const gltf = new Saber.GLTFLoader(gltfDuck_url, gltfDuck_bin);
+    const gltf = new Saber.GLTFLoader(gltfDuck_url);
     await gltf.load();
-    const data = gltf.getMoldData();
-    console.log(data);
+    const geo = gltf.getGeomery();
 
-    // const geo = Saber.Geometry.plane(500, 500 * (9 / 16), [1, 1, 1, 1]);
     const shader = new Saber.Shader({ app, vs, fs });
     const mesh = new Saber.Mesh({
       app,
-      geo: data,
+      geo,
       shader,
       attribute: {},
       uniform: {
@@ -141,12 +138,11 @@ export default class CExample {
           imgNegY,
           imgNegZ,
         ]),
-        // uTexture0: new Saber.Texture("../img/sample.jpg"),
         uMousePos: true,
         uTime: true,
         eyePos: this.camera.getPos(),
         refraction: true,
-        refractiveIndex: 1.1,
+        refractiveIndex: 1.02,
       },
       cullFace: "BACK",
       depthMask: true,
