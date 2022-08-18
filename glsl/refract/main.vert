@@ -12,13 +12,13 @@ uniform mat4 mMatrix;
 uniform mat4 mvpMatrix;
 uniform mat4 normalInverseMatrix;
 // uniform float uTime;
-// uniform vec2 uMousePos;
+uniform vec2 uMousePos;
 
 void main(){
   // vColor = color;
+  // vec3 pos = vec3(position.x + uMousePos.x,position.y + uMousePos.y, position.z);
   vPosition = (mMatrix * vec4(position, 1.0)).xyz;
   vNormal = normalize((normalInverseMatrix * vec4(normal, 0.0)).xyz);
-  
   // vTexCoord = texCoord;
 
   // gl_Position = mvpMatrix * vec4(position.x, position.y, sin( position.x * (uTime / 100.)) * 100., 1.);

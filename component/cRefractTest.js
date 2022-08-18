@@ -14,6 +14,10 @@ import gltfDuck_bin from "../gltf/Duck_data.bin?url";
 export default class CRefractTest {
   constructor() {
     console.log("CRefract");
+    this.mousePos = { x: 0, y: 0 };
+    this.mousePosNow = { x: 0, y: 0 };
+    this.eMousemoveHandler = this.eMousemove.bind(this);
+    window.addEventListener("mousemove", this.eMousemoveHandler);
     this.init();
   }
   async init() {
@@ -29,7 +33,8 @@ export default class CRefractTest {
     // this.cube.rotate.axis.y = 1;
     // this.cube.rotate.axis.y = 1;
 
-    this.duck = await this.createGltf();
+    // this.duck = await this.createGltf();
+    this.duck = this.createSphere();
     this.duck.rotate.axis.z = 0.3;
     this.duck.rotate.axis.x = 0.3;
     this.duck.rotate.axis.y = 1;
@@ -41,6 +46,11 @@ export default class CRefractTest {
     // this.scene.add(this.mesh_);
 
     this.tick();
+  }
+  eMousemove(e) {
+    console.log(this.app.sw, this.app.sw - e.clientX / 2);
+    this.mousePos.x = e.clientX - this.app.sw / 2;
+    this.mousePos.y = this.app.sh / 2 - e.clientY;
   }
 
   createCube() {
@@ -110,13 +120,55 @@ export default class CRefractTest {
     return mesh;
   }
 
+  createSphere() {
+    const { app } = this;
+    const row = 32;
+    const column = 32;
+    const size = 60.0;
+    const color = [1.0, 1.0, 1.0, 1.0];
+
+    const geo = Saber.Geometry.sphere(row, column, size, color);
+
+    const shader = new Saber.Shader({ app, vs, fs });
+    const mesh = new Saber.Mesh({
+      app,
+      geo,
+      shader,
+      attribute: {},
+      uniform: {
+        uTexture0: new Saber.CubeMap(
+          [sampleImg, sampleImg, sampleImg, sampleImg, sampleImg, sampleImg],
+          { slot: 0 }
+        ),
+        uTexture1: new Saber.CubeMap(
+          [imgPosX, imgPosY, imgPosZ, imgNegX, imgNegY, imgNegZ],
+          { slot: 1 }
+        ),
+        // uTexture0: new Saber.Texture("../img/sample.jpg"),
+        uMousePos: true,
+        uTime: true,
+        eyePos: this.camera.getPos(),
+        refraction: true,
+        refractiveIndex: 1.09,
+      },
+      cullFace: "BACK",
+      depthMask: true,
+    });
+    return mesh;
+  }
+
   tick() {
     requestAnimationFrame(() => this.tick());
+
+    this.mousePosNow.x += (this.mousePos.x - this.mousePosNow.x) * 0.1;
+    this.mousePosNow.y += (this.mousePos.y - this.mousePosNow.y) * 0.1;
 
     const { scene, camera } = this;
     this.app.render(scene, camera);
     if (this.duck.uniform) {
       this.duck.rotate.value += 0.01;
+      this.duck.translate.x = this.mousePosNow.x;
+      this.duck.translate.y = this.mousePosNow.y;
     }
   }
 }

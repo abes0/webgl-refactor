@@ -39,7 +39,7 @@ void main(){
 
   vec4 envColor = textureCube(uTexture0, refractVec);
   vec4 envColor_ = textureCube(uTexture1, refractVec);
-  gl_FragColor = mix(envColor_, envColor, 0.5);
+  gl_FragColor = mix(envColor_, envColor, 0.0);
   // gl_FragColor = envColor;
   // gl_FragColor = vec4(1.0, 0, 0, 0.);
 
