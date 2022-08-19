@@ -15,6 +15,7 @@ import gltfDuck_bin from "../gltf/Duck_data.bin?url";
 export default class CExample {
   constructor() {
     console.log("CExample");
+    this.addLisence();
     this.init();
   }
   async init() {
@@ -262,6 +263,13 @@ export default class CExample {
       depthMask: true,
     });
     return mesh;
+  }
+
+  addLisence() {
+    const div = document.createElement("div");
+    div.classList.add("lisence");
+    div.innerHTML = `image by <a href="http://www.humus.name" target="_blank">Emil Persson</a>`;
+    document.body.append(div);
   }
 
   tick() {

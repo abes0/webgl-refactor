@@ -18,3 +18,19 @@ body {
 #canvas {
   pointer-events: none;
 }
+
+.lisence {
+  position: fixed;
+  bottom: 10px;
+  left: 10px;
+  background: rgba(#000, 0.3);
+  color: #555;
+  line-height: 1;
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 12px;
+  a {
+    text-decoration: none;
+    color: #555;
+  }
+}
