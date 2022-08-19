@@ -5,13 +5,10 @@ import vs_sphere from "../glsl/slider/sphere.vert?raw";
 import fs_sphere from "../glsl/slider/sphere.frag?raw";
 import vs_plate from "../glsl/slider/plate.vert?raw";
 import fs_plate from "../glsl/slider/plate.frag?raw";
-import sampleImg from "../img/sample.jpg";
 import texDist from "../img/slider/texture03.jpg";
 import img01 from "../img/slider/01.jpg";
 import img02 from "../img/slider/02.jpg";
 import img03 from "../img/slider/03.jpg";
-import gltfDuck_url from "../gltf/Duck.gltf?url";
-import gltfDuck_bin from "../gltf/Duck_data.bin?url";
 
 export default class CSlider {
   constructor() {

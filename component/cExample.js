@@ -119,7 +119,7 @@ export default class CExample {
 
   async createGltf() {
     const { app } = this;
-    const gltf = new Saber.GLTFLoader(gltfDuck_url);
+    const gltf = new Saber.GLTFLoader(gltfDuck_url, gltfDuck_bin);
     await gltf.load();
     const geo = gltf.getGeomery();
 

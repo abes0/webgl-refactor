@@ -28,12 +28,13 @@ const WEBGL_TYPE_SIZES = {
 };
 
 export class GLTFLoader {
-  constructor(path) {
+  constructor(path, binaryData = "") {
     this.name = "GLTFLoader";
     console.log(this.name);
 
     // setup
     this.path = path;
+    this.binaryData = binaryData;
     this.pathWhere = path.substr(0, path.lastIndexOf("/") + 1);
 
     // request
@@ -68,7 +69,7 @@ export class GLTFLoader {
     const { componentType, byteOffset: a_byteOffset, count } = accessor;
     const TypedArray = WEBGL_COMPONENT_TYPES[componentType];
     const data = await this.binaryParser(
-      this.pathWhere + this.data.buffers[buffer].uri
+      this.binaryData || this.pathWhere + this.data.buffers[buffer].uri
     );
     const tmp = new TypedArray(data, byteOffset + a_byteOffset, stride * count);
     return tmp;
