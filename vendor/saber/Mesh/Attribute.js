@@ -19,6 +19,7 @@ export class Attribute {
       const stride = target[1];
       const vbo = this._createVBO(gl, value, key);
       const location = this._getLocation(gl, program, key);
+      if (location === -1) continue;
       this[key] = { location, vbo, value, stride };
     }
     // return _attr;

@@ -20,13 +20,6 @@ export class CubeMap {
 
     const prmiseArray = this.pathArray.map((path) => this.load(path));
     const imagesArray = await Promise.all(prmiseArray);
-    // this.CubeMapObjectArray = await this.createCubeMap(
-    //   gl,
-    //   imagesArray,
-    //   targetArray
-    // );
-    // console.log(this.images);
-    // this.createCubeMap(gl);
     this.createCubeMap(gl, imagesArray, targetArray);
   }
 
@@ -50,7 +43,6 @@ export class CubeMap {
     return new Promise((resolve) => {
       const texture = gl.createTexture();
       gl.activeTexture(gl[slotText]);
-      console.log("abababababa", gl.getParameter(gl.ACTIVE_TEXTURE));
       gl.bindTexture(gl.TEXTURE_CUBE_MAP, texture);
       targetArray.forEach((item, index) => {
         gl.texImage2D(
@@ -86,7 +78,6 @@ export class CubeMap {
   }
 
   getCubeMapObj() {
-    console.log("getCubeMapObj", this.cubeMapObj);
     return this.cubeMapObj;
   }
 }
